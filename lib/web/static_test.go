@@ -58,7 +58,7 @@ func (s *StaticSuite) TestLocalFS(c *check.C) {
 	bytes, err := ioutil.ReadAll(f)
 	c.Assert(err, check.IsNil)
 
-	html := string(bytes[:])
+	html := string(bytes)
 	c.Assert(f.Close(), check.IsNil)
 	c.Assert(strings.Contains(html, `<script src="/web/config.js"></script>`), check.Equals, true)
 	c.Assert(strings.Contains(html, `content="{{ .XCSRF }}"`), check.Equals, true)

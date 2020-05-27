@@ -134,11 +134,11 @@ func (muk *Key) RegisterResponse(req *u2f.RegisterRequest) (*u2f.RegisterRespons
 	marshalledPublickey := elliptic.Marshal(elliptic.P256(), muk.privatekey.PublicKey.X, muk.privatekey.PublicKey.Y)
 
 	var dataToSign []byte
-	dataToSign = append(dataToSign[:], 0)
-	dataToSign = append(dataToSign[:], appIDHash[:]...)
-	dataToSign = append(dataToSign[:], clientDataHash[:]...)
-	dataToSign = append(dataToSign[:], muk.keyHandle[:]...)
-	dataToSign = append(dataToSign[:], marshalledPublickey[:]...)
+	dataToSign = append(dataToSign, 0)
+	dataToSign = append(dataToSign, appIDHash[:]...)
+	dataToSign = append(dataToSign, clientDataHash[:]...)
+	dataToSign = append(dataToSign, muk.keyHandle...)
+	dataToSign = append(dataToSign, marshalledPublickey...)
 
 	dataHash := sha256.Sum256(dataToSign)
 
@@ -150,11 +150,11 @@ func (muk *Key) RegisterResponse(req *u2f.RegisterRequest) (*u2f.RegisterRespons
 
 	var regData []byte
 	regData = append(regData, 5) // fixed by specification
-	regData = append(regData, marshalledPublickey[:]...)
+	regData = append(regData, marshalledPublickey...)
 	regData = append(regData, byte(len(muk.keyHandle)))
-	regData = append(regData, muk.keyHandle[:]...)
-	regData = append(regData, muk.cert[:]...)
-	regData = append(regData, sig[:]...)
+	regData = append(regData, muk.keyHandle...)
+	regData = append(regData, muk.cert...)
+	regData = append(regData, sig...)
 
 	return &u2f.RegisterResponse{
 		RegistrationData: encodeBase64(regData),
@@ -191,7 +191,7 @@ func (muk *Key) SignResponse(req *u2f.SignRequest) (*u2f.SignResponse, error) {
 	var dataToSign []byte
 	dataToSign = append(dataToSign, appIDHash[:]...)
 	dataToSign = append(dataToSign, 1) // user presence
-	dataToSign = append(dataToSign, counterBytes[:]...)
+	dataToSign = append(dataToSign, counterBytes...)
 	dataToSign = append(dataToSign, clientDataHash[:]...)
 
 	dataHash := sha256.Sum256(dataToSign)
@@ -204,8 +204,8 @@ func (muk *Key) SignResponse(req *u2f.SignRequest) (*u2f.SignResponse, error) {
 
 	var signData []byte
 	signData = append(signData, 1) // user presence
-	signData = append(signData, counterBytes[:]...)
-	signData = append(signData, sig[:]...)
+	signData = append(signData, counterBytes...)
+	signData = append(signData, sig...)
 
 	return &u2f.SignResponse{
 		KeyHandle:     req.KeyHandle,
